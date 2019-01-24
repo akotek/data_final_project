@@ -1,0 +1,13 @@
+* Edits being done on data:
+
+1. Removed photos/col's which are not data related
+2. Removed LS/ST/RS/LW/LF...etc DATA COLS - those col's are given the GRADE of a player in those fields
+like: if i'm MESSI - I will be better in my original position (LW for example) and will get lower score in position
+RS (right striker) or ML (midifielder left) - i removed this cause it seems it's too much data.
+we can restore it if wanted.
+3. Added column about time_of_player_in_team == which is just how much time he is in team == NOW()-start_contract
+
+
+* INFO about cols:
+1. ratings on scale of 100 (Dribbling, Agility etc)
+2. International rep / week foot/ skill moves - rating on scale of 5
