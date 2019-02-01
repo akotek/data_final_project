@@ -1,0 +1,55 @@
+-------------------------------
+Install / usage:
+# to use requirements use pip with - pip install -r /path/to/requirements.txt
+-------------------------------
+
+
+--------------------------------
+TODO when coding new stuff:
+* define proply API's (with right params) so neural_net module will understand how to call it
+* Comment each 'interesting' method and each step
+* update run_example to let others know how to use the API's:
+* keep use of Asserts in main code areas - this will help us debug later on
+* keep write new methods/stuff in it's place so we can have module/nice code - would help in future
+* edit TODO list after you finish working
+--------------------------------
+* DESIGN INFO:
+
+* Simple design so far:
+- 2x Modules - data_parser, neural_net
+- Neural net class will connect the API given by data_parser (read below)
+- All data will be (int) type -- meaning 24.5123 will be 24, etc. think if this what we want
+-------------------------------
+* VECTORS INFO :
+
+- VECTORS will use ratings on scale of [1, 100] (Dribbling, Agility etc), if scale is not on that
+    we need to update data to be in that scaling (for later algorithm use)
+- Player vector is done as defined in constant
+- Club vector now is just simple mean() operation on all players from that club, we will need to enhance it
+-------------------------------
+* Other info:
+
+- preprocess method cleans/edits/removes data - please update it
+
+-------------------------------
+
+* Given API's to Neural Net module:
+    # run_example to see how to use those API's:
+
+    1. get_player_simple_vector(df, player)
+    2. get_player_complex_vector(df, player)
+    3. get_simple_club_vector(df, club)
+    4. get_complex_club_vector(df, club)
+
+TODO (by priority - first- most important):
+0. make player simple vector int
+1. enhance simple club vector (it's small now)
+2. get more data for clubs complex vector
+3. implement player complex vector AFTER neural net module?
+4. implement methods with to do in them methods
+
+TODO to think of:
+1. Goalkeepers have different attributes (see CSV) how we work with them?
+2. if we want to have 3x MODULES (defenders, midfilders, attackers) need to make special methods
+to get all those (get_defenders(df, club), get_mid(df, club)... this easy cause we have col's)
+
