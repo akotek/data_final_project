@@ -2,8 +2,8 @@
 Install / usage:
 # to use requirements use pip with - pip install -r /path/to/requirements.txt
 -------------------------------
-
-
+DATA #1:
+https://www.kaggle.com/karangadiya/fifa19
 --------------------------------
 TODO when coding new stuff:
 * define proply API's (with right params) so neural_net module will understand how to call it
@@ -52,4 +52,5 @@ TODO to think of:
 1. Goalkeepers have different attributes (see CSV) how we work with them?
 2. if we want to have 3x MODULES (defenders, midfilders, attackers) need to make special methods
 to get all those (get_defenders(df, club), get_mid(df, club)... this easy cause we have col's)
+
 

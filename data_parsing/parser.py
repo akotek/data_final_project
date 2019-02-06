@@ -17,7 +17,7 @@ SIMPLE_PLAYER_VECTOR = ['Overall', 'Potential', 'Crossing', 'Finishing', 'Headin
 COMPLEX_PLAYER_VECTOR = ['Age', 'Wage', 'International Reputation', 'Work Rate', 'Time In Club', 'Height',
                          'Weight', 'Release Clause']
 
-SIMPLE_CLUB_VECTOR = ['Age', 'Wage', 'Value', 'Overall']  # generated from players
+SIMPLE_CLUB_VECTOR = ['Age', 'Wage', 'Value', 'Overall', 'Agility']  # generated from players
 
 COMPLEX_CLUB_VECTOR = ['Wins Per Season', 'Loses Per Season', 'Coach Level', 'Team History']  # TODO get his data:
 
@@ -110,10 +110,10 @@ def run_example(df):
     # barca_players = get_players_from_club(df, 'FC Barcelona')
     # print(barca_players.head)
 
-    player_vec = get_player_simple_vector(df, 'L. Messi')
-    print(player_vec)
+    # player_vec = get_player_simple_vector(df, 'L. Messi')
+    # print(player_vec)
 
-    # print(get_simple_club_vector(df, 'FC Barcelona'))
+    print(get_simple_club_vector(df, 'FC Barcelona'))
     # --------------------------------------------
 
 
