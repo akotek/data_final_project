@@ -166,7 +166,7 @@ def get_top_similarities(all_players: pd.DataFrame, selected_players: pd.DataFra
                          distance_func=eval_cosine_dist) -> pd.DataFrame:
     """
 
-    :param all_players:
+    :param all_players: 5
     :param selected_players:
     :param recommendations_num:
     :param distance_func:
