@@ -7,7 +7,7 @@ import math
 
 # Constants
 # ------------------------------------------
-UNWANTED_COLS = [ 'Special','International Reputation', 'Jersey Number', 'Joined', 'Release Clause']
+UNWANTED_COLS = ['Special', 'International Reputation', 'Jersey Number', 'Joined', 'Release Clause']
 
 REMOVE_WAGES = ['Value','Wage']
 
@@ -68,7 +68,7 @@ def parse_weight(wt_string):
 # ------------------------------------------
 
 
-def pre_process(df, goalkeeper=False):
+def pre_process(df: pd.DataFrame, goalkeeper=False):
     """
     cleaning the pandas data frame by removing duplicates name, unwanted columes
     :param df: the data fram pandas object
@@ -92,6 +92,7 @@ def pre_process(df, goalkeeper=False):
     # df = df[SIMPLE_PLAYER_VECTOR]
     # df = df.dropna()
     print('after droping null values: ' + str(len(df['ID'])))
+    df.set_index('ID',drop=True,inplace=True)
     return df
 
 
@@ -130,7 +131,7 @@ def compute_distance(all_players: pd.DataFrame, chosen_players: pd.DataFrame, di
 
 def run_example(df):
     df = pre_process(df)
-    compute_distance(df, df)
+    # compute_distance(df, df)
 
 
 # ------------------------------------------
