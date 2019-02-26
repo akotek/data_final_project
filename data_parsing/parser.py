@@ -13,7 +13,7 @@ REMOVE_WAGES = ['Value','Wage']
 
 
 SIGNS_TO_CLEAN = ['€']
-SIMPLE_PLAYER_VECTOR = ['Name', 'ID','Crossing', 'Finishing', 'HeadingAccuracy',
+SIMPLE_PLAYER_VECTOR = ['Name', 'ID','Height','Work Rate','Weak Foot','Skill Moves','Crossing', 'Finishing', 'HeadingAccuracy',
                         'ShortPassing', 'Volleys', 'Dribbling', 'Curve', 'FKAccuracy',
                         'LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility', 'Reactions', 'Balance',
                         'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots', 'Aggression', 'Interceptions',
@@ -63,6 +63,16 @@ def parse_weight(wt_string):
         return wt_string
     num = re.findall(r'\d+', wt_string)
     return float(num[0])
+WORK_RATE = {'Medium': 50, 'Low': 0, 'High': 100}
+def split_work_rate(x):
+    if x is np.nan:
+        defensive = 0
+        attacking = 0
+    else:
+        s = x.split('/ ')
+        defensive  = WORK_RATE[s[0]]
+        attacking = WORK_RATE[s[1]]
+    return pd.Series([defensive, attacking], index=['defensive work rate','attacking work rate'])
 
 def normalize(score, max_value, min_value,max_score=100):
 
@@ -79,8 +89,12 @@ def pre_process(df, goalkeeper=False, features = SIMPLE_PLAYER_VECTOR):
     :param goalkeeper: if true returns only goalkeepers, otherwise return other player type
     :return: the data frame after cleaning it up
     """
-    df.drop(columns=UNWANTED_COLS, inplace=True)
-    df.drop(columns=REMOVE_WAGES)
+    if 'Work Rate' in features:
+        df[['defensive work rate','attacking work rate']] = df['Work Rate'].apply(split_work_rate)
+        df.drop(columns=['Work Rate'],inplace=True)
+        features.remove('Work Rate')
+        features.append('defensive work rate')
+        features.append('attacking work rate')
     if 'Weak Foot' in features:
         df['Weak Foot'] = df['Weak Foot'].apply(lambda x:normalize(x,5,1))
     if 'Skill Moves' in features:
@@ -95,14 +109,14 @@ def pre_process(df, goalkeeper=False, features = SIMPLE_PLAYER_VECTOR):
         max_value = df['Weight'].max()
         min_value = df['Weight'].min()
         df['Weight'] = df['Weight'].apply(lambda x: normalize(x, max_value, min_value))
-    print('max: ', df['Height'].max(), ' min: ', df['Height'].min())
+    # print('max: ', df['Height'].max(), ' min: ', df['Height'].min())
     print('totals values: ' + str(len(df['Name'])))
     if goalkeeper:
         df = df[df["Position"] == 'GK']
-        df = df[SIMPLE_GK_PLAYER_VECTOR]
+        df = df[features]
     else:
         df = df[df["Position"] != 'GK']
-        df = df[SIMPLE_PLAYER_VECTOR]
+        df = df[features]
     df = df.drop_duplicates(subset=['Name'])
 
     print('unique names: ' + str(len(df['Name'])))
