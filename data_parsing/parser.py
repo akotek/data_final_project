@@ -93,6 +93,7 @@ def pre_process(df: pd.DataFrame, goalkeeper=False):
     # df = df.dropna()
     print('after droping null values: ' + str(len(df['ID'])))
     df.set_index('ID',drop=True,inplace=True)
+
     return df
 
 
