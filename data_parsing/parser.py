@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import re
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity, manhattan_distances
 import math
 
 # Constants
@@ -111,6 +111,13 @@ def cosine_distance(df: pd.DataFrame):
             player_distances[i][j] = cos[0][0]
             print(i, j, cos[0][0])
     print()
+
+def eval_cosine_dist(player1,player2):
+    return cosine_similarity([player1],[player2])[0][0]
+
+
+def eval_manhatan_dist(player1,player2):
+    return manhattan_distances([player1],[player2])[0][0]
 
 
 def run_example(df):
