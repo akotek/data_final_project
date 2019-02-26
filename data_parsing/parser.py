@@ -99,30 +99,38 @@ def pre_process(df, goalkeeper=False):
 # COSINE DISTANCE:
 # ------------------------------------------
 
+def eval_cosine_dist(player1, player2):
+    return cosine_similarity([player1], [player2])[0][0]
 
-def cosine_distance(df: pd.DataFrame):
 
-    tmp_df = df.drop(columns=['Name', 'ID']).dropna()
+def eval_manhatan_dist(player1, player2):
+    return manhattan_distances([player1], [player2])[0][0]
+
+
+def compute_distance(all_players: pd.DataFrame, chosen_players: pd.DataFrame, distance_function=eval_cosine_dist)\
+        -> dict:
+    """
+    :param all_players: All players
+    :param chosen_players: Plyers of interest
+    :return: dictionary of dictionaries:
+                To access the distance of player1 from player2 do:
+                player_distances[player1_id][player2_id]
+    """
+    all_players = all_players.drop(columns=['Name', 'ID']).dropna()
+    chosen_players = chosen_players.drop(columns=['Name', 'ID']).dropna()
     player_distances = dict()
-    for i, player1 in tmp_df.iterrows():
+    for i, player1 in all_players.iterrows():
         player_distances[i] = dict()
-        for j, player2 in tmp_df.iterrows():
-            cos = cosine_similarity([player1], [player2])
-            player_distances[i][j] = cos[0][0]
-            print(i, j, cos[0][0])
-    print()
-
-def eval_cosine_dist(player1,player2):
-    return cosine_similarity([player1],[player2])[0][0]
-
-
-def eval_manhatan_dist(player1,player2):
-    return manhattan_distances([player1],[player2])[0][0]
+        for j, player2 in chosen_players.iterrows():
+            distance = distance_function(player1, player2)
+            player_distances[i][j] = distance
+            print(i, j, distance)
+    return player_distances
 
 
 def run_example(df):
     df = pre_process(df)
-    cosine_distance(df)
+    compute_distance(df, df)
 
 
 # ------------------------------------------
