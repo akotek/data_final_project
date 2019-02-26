@@ -63,12 +63,16 @@ def parse_weight(wt_string):
         return wt_string
     num = re.findall(r'\d+', wt_string)
     return float(num[0])
+
+def normalize(score, max_value, min_value,max_score=100):
+
+    return max_score * (score - min_value) / (max_value - min_value)
 # ------------------------------------------
 # Player methods:
 # ------------------------------------------
 
 
-def pre_process(df, goalkeeper=False):
+def pre_process(df, goalkeeper=False, features = SIMPLE_PLAYER_VECTOR):
     """
     cleaning the pandas data frame by removing duplicates name, unwanted columns
     :param df: the data fram pandas object
@@ -77,8 +81,21 @@ def pre_process(df, goalkeeper=False):
     """
     df.drop(columns=UNWANTED_COLS, inplace=True)
     df.drop(columns=REMOVE_WAGES)
-    df["Height"].apply(lambda x: parse_height(x))
-    df["Weight"].apply(lambda x: parse_weight(x))
+    if 'Weak Foot' in features:
+        df['Weak Foot'] = df['Weak Foot'].apply(lambda x:normalize(x,5,1))
+    if 'Skill Moves' in features:
+        df['Skill Moves'] = df['Skill Moves'].apply(lambda x:normalize(x,5,1))
+    if 'Height' in features:
+        df["Height"] = df["Height"].apply(lambda x:parse_height(x))
+        max_value = df['Height'].max()
+        min_value = df['Height'].min()
+        df["Height"] = df['Height'].apply(lambda x:normalize(x,max_value,min_value))
+    if 'Weight' in features:
+        df['Weight'] = df["Weight"].apply(lambda x:parse_weight(x))
+        max_value = df['Weight'].max()
+        min_value = df['Weight'].min()
+        df['Weight'] = df['Weight'].apply(lambda x: normalize(x, max_value, min_value))
+    print('max: ', df['Height'].max(), ' min: ', df['Height'].min())
     print('totals values: ' + str(len(df['Name'])))
     if goalkeeper:
         df = df[df["Position"] == 'GK']
