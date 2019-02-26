@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 import re
+from sklearn.metrics.pairwise import cosine_similarity
+import math
 
 # Constants
 # ------------------------------------------
@@ -26,15 +28,15 @@ SIMPLE_GK_PLAYER_VECTOR = [ 'Name', 'ID', 'Crossing', 'Finishing', 'HeadingAccur
 SIMPLE_PLAYER_VECTOR_NUMS_RATING = [ 'Weak Foot','Skill Moves','Height','Weight']
 
 
-
-
 # ------------------------------------------
 
 # Utils methods:
 # ------------------------------------------
 
+
 def relpath(path):
     return os.path.join(os.path.dirname(__file__), path)
+
 
 def parse_height(ht_string):
     """
@@ -50,6 +52,7 @@ def parse_height(ht_string):
     in_ = float(ht_[1].replace("\"",""))
     return (12*ft_) + in_
 
+
 def parse_weight(wt_string):
     """
     remove all char in the string and return a float
@@ -58,7 +61,7 @@ def parse_weight(wt_string):
     """
     if wt_string is np.nan:
         return wt_string
-    num = re.findall(r'\d+',wt_string)
+    num = re.findall(r'\d+', wt_string)
     return float(num[0])
 # ------------------------------------------
 # Player methods:
@@ -95,33 +98,24 @@ def pre_process(df, goalkeeper=False):
 # ------------------------------------------
 # COSINE DISTANCE:
 # ------------------------------------------
-from sklearn.metrics.pairwise import cosine_similarity
-import math
+
+
 def cosine_distance(df: pd.DataFrame):
-    names = df['Name']
-    print(df.head())
 
-
-    # tmpPlayerRating = pd.DataFrame(index=names,columns=names)
-    # print(tmpPlayerRating.head())
-    # for i in range(0, len(tmpPlayerRating.columns)):
-    #     for j in range(0, len(tmpPlayerRating.columns)):
-    tmp_df = df.drop(columns=['Name','ID'])
-    # tmp_df = df.dropna()
-    player_matrix = np.empty([len(names),len(names)])
+    tmp_df = df.drop(columns=['Name', 'ID']).dropna()
+    player_distances = dict()
     for i, player1 in tmp_df.iterrows():
+        player_distances[i] = dict()
         for j, player2 in tmp_df.iterrows():
             cos = cosine_similarity([player1], [player2])
-            player_matrix[i][j] = cos[0][0]
-            print(i, j,cos[0][0])
-
-
+            player_distances[i][j] = cos[0][0]
+            print(i, j, cos[0][0])
+    print()
 
 
 def run_example(df):
     df = pre_process(df)
     cosine_distance(df)
-
 
 
 # ------------------------------------------
