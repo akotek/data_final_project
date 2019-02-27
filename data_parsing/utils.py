@@ -45,8 +45,8 @@ def split_work_rate(x):
         attacking = 0
     else:
         s = x.split('/ ')
-        defensive = WORK_RATE[s[0]]
-        attacking = WORK_RATE[s[1]]
+        defensive = float(WORK_RATE[s[0]])
+        attacking = float(WORK_RATE[s[1]])
     return pd.Series([defensive, attacking], index=['defensive work rate', 'attacking work rate'])
 
 

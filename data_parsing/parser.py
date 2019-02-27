@@ -97,9 +97,11 @@ def compute_distance(all_players: pd.DataFrame, selected_players: pd.DataFrame, 
     player_distances = dict()
     for i, player1 in selected_players.iterrows():
         player_distances[i] = dict()
+        weights = generate_weights(player1)
+        player1 = player1.drop(labels = ['Position','Name']).dropna().astype('float64')
         for j, player2 in all_players.iterrows():
             if i != j:
-                distance = distance_func(player1, player2)
+                distance = distance_func(player1, player2, weights)
                 player_distances[i][j] = distance
                 print(i, j, distance)
     return player_distances
@@ -123,8 +125,8 @@ def get_top_similarities(df: pd.DataFrame, selected_players: pd.DataFrame, recom
     if recommendations_num > len(df) - 1:
         recommendations_num = len(df) - 1
     # clean df to stay with numeric only:
+
     all_players = df.drop(columns=['Name', 'Position']).dropna()
-    selected_players = selected_players.drop(columns=['Name', 'Position']).dropna()
     # compute:
     distances = compute_distance(all_players, selected_players, distance_func)
     top_similarities_list = []
@@ -135,17 +137,44 @@ def get_top_similarities(df: pd.DataFrame, selected_players: pd.DataFrame, recom
     return pd.concat(top_similarities_list)
 
 
-def generate_weights(df, player_id):
+def generate_weights(player):
     """
     Heuristic to generate weights of players:
     1. Sort features from existing similar players using - (7-of-the-most-uniquely-similar-players) article
     2. Use f(x) = x to determine feature weights
     See constants.py for detailed metrics
     """
+    player_pos = player['Position']
+    axes = (player.drop(labels = ['Position','Name']).axes)[0]
+    axes_length = len(axes)
+    weights = list()
+    if player_pos in DEFENDERS:
+        for feature in axes:
+            index = DEFENDERS_WEIGHTS_SORT.index(feature)
+            weight_val =  axes_length - index
+            weights.append(weight_val**5)
+    elif player_pos in MIDFIELDERS:
+        for feature in axes:
+            index = MIDFIELDERS_WEIGHTS_SORT.index(feature)
+            weight_val =  axes_length - index
+            weights.append(weight_val**4)
+    elif player_pos in FORWARDS:
+        for feature in axes:
+            index = FORWARDS_WEIGHTS_SORT.index(feature)
+            weight_val =  axes_length - index
+            weights.append(weight_val**4)
+    elif player_pos in GOALKEEPERS:
+        pass
+        #TODO
+    else:
+        return None
+    return weights
+
+
     # TODO.........
-    pos = df.loc[player_id]['Position']
-    all_players = df.drop(columns=['Name', 'Position']).dropna()
-    idx_mat = np.arange(1, all_players.shape[0])
+    # pos = df.loc[player_id]['Position']
+    # all_players = df.drop(columns=['Name', 'Position']).dropna()
+    # idx_mat = np.arange(1, all_players.shape[0])
     # if pos in DEFENDERS:
     # DEFENDERS_WEIGHTS_SORT
     pass
@@ -156,9 +185,9 @@ def generate_weights(df, player_id):
 # ------------------------------------------
 def run_example(df):
     df = pre_process(df)
-    players = ['Cristiano Ronaldo', 'A. Griezmann']
+    players = ['Sergio Ramos']
     chosen_players = get_players(df, players)
-    top_similiar = get_top_similarities(df, chosen_players, recommendations_num=4, distance_func=eval_cosine_dist)
+    top_similiar = get_top_similarities(df, chosen_players, recommendations_num=5, distance_func=eval_cosine_dist)
 
     print(top_similiar)
     print()

@@ -40,21 +40,21 @@ MIDFIELDERS_WEIGHTS_SORT = ['Dribbling', 'Strength', 'Volleys', 'Positioning', '
                             'Potential', 'Curve', 'SprintSpeed', 'Composure', 'Marking', 'Stamina', 'Height',
                             'FKAccuracy', 'Crossing', 'Acceleration', 'Balance', 'LongShots', 'Penalties', 'Agility',
                             'ShotPower', 'Interceptions', 'SlidingTackle', 'StandingTackle', 'Jumping', 'Weak Foot',
-                            'defensive work rate', 'attacking work rate', 'Skill Moves'].reverse()
+                            'defensive work rate', 'attacking work rate', 'Skill Moves']
 # Cristiano Ronaldo vs Neymar Jr:
 FORWARDS_WEIGHTS_SORT = ['LongPassing', 'BallControl', 'SprintSpeed', 'Composure', 'Marking', 'Reactions',
-                         'Finishing''ShortPassing', 'Volleys', 'Penalties', 'Crossing', 'Acceleration', 'Vision',
+                         'Finishing','ShortPassing', 'Volleys', 'Penalties', 'Crossing', 'Acceleration', 'Vision',
                          'Positioning', 'Curve', 'Stamina', 'Aggression', 'Interceptions', 'StandingTackle',
                          'Dribbling', 'Agility', 'SlidingTackle', 'FKAccuracy', 'LongShots',
                          'Balance', 'ShotPower', 'Height', 'HeadingAccuracy', 'Strength', 'Jumping',
-                         'attacking work rate', 'Skill Moves', 'defensive work rate', 'Weak Foot'].reverse()
+                         'attacking work rate', 'Skill Moves', 'defensive work rate', 'Weak Foot']
 # Sergio Ramos vs Piqué:
 DEFENDERS_WEIGHTS_SORT = ['Strength', 'Reactions', 'Vision', 'Interceptions', 'Positioning', 'ShortPassing',
                           'LongPassing', 'Composure', 'Marking', 'BallControl', 'defensive work rate',
                           'StandingTackle', 'SlidingTackle', 'HeadingAccuracy', 'LongShots', 'Penalties',
-                          'Crossing', 'Volleys' 'SprintSpeed', 'Curve', 'Aggression', 'ShotPower', 'Balance',
+                          'Crossing', 'Volleys', 'SprintSpeed', 'Curve', 'Aggression', 'ShotPower', 'Balance',
                           'Jumping', 'Stamina', 'Height', 'Agility', 'Finishing', 'Dribbling', 'Skill Moves',
-                          'Acceleration', 'Weak Foot', 'FKAccuracy', 'attacking work rate'].reverse()
+                          'Acceleration', 'Weak Foot', 'FKAccuracy', 'attacking work rate']
 
 
 def get_similarity_by_article(d, lst):
