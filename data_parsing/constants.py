@@ -56,6 +56,8 @@ DEFENDERS_WEIGHTS_SORT = ['Strength', 'Reactions', 'Vision', 'Interceptions', 'P
                           'Jumping', 'Stamina', 'Height', 'Agility', 'Finishing', 'Dribbling', 'Skill Moves',
                           'Acceleration', 'Weak Foot', 'FKAccuracy', 'attacking work rate']
 
+MONEY_FEATURES = ['Value', 'Release Clause', 'Wage']
+
 
 def get_similarity_by_article(d, lst):
     # prints sorted difference between wanted rows used to calc weights

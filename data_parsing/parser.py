@@ -49,8 +49,36 @@ def pre_process(df, goalkeeper=False, features=SIMPLE_PLAYER_VECTOR):
     print('unique names: ' + str(len(df['Name'])))
     print('after droping null values: ' + str(len(df['ID'])))
     df.set_index('ID', drop=True, inplace=True)
-
+    df = normalize_data(df)
     return df
+
+
+def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalize DF to std=1 mean=0
+    Make sure that df has only numeric variables
+    :param df:
+    :return:
+    """
+    return (df - df.mean()) / df.std()
+
+
+def normalize_data(original_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalizes the data separately for every type of players
+    Midfielders, attackers, defenders and goalkeepers players together will have std=1 and mean=0 for each group
+    :param original_df:
+    :return:
+    """
+    df_defenders = utils.get_rows_with_col_val(original_df, 'Position', DEFENDERS)
+    df_midfielders = utils.get_rows_with_col_val(original_df, 'Position', MIDFIELDERS)
+    df_forwards = utils.get_rows_with_col_val(original_df, 'Position', FORWARDS)
+    df_list = [df_defenders, df_midfielders, df_forwards]
+    for i in range(len(df_list)):
+        df_list[i] = normalize_df(df_list[i].drop(['Name', 'Position'], axis=1))
+    normalized_df = pd.concat(df_list)
+    original_df = original_df[['Name', 'Position']].merge(normalized_df, left_index=True, right_index=True)
+    return original_df
 
 
 def get_players(df, lst) -> pd.DataFrame:
@@ -97,8 +125,9 @@ def compute_distance(all_players: pd.DataFrame, selected_players: pd.DataFrame, 
     player_distances = dict()
     for i, player1 in selected_players.iterrows():
         player_distances[i] = dict()
-        weights = generate_weights(player1)
-        player1 = player1.drop(labels = ['Position','Name']).dropna().astype('float64')
+        # weights = generate_weights(player1)
+        weights = None
+        player1 = player1.drop(labels=['Position', 'Name']).dropna().astype('float64')
         for j, player2 in all_players.iterrows():
             if i != j:
                 distance = distance_func(player1, player2, weights)
@@ -115,13 +144,19 @@ def get_top_similarities_helper(player_distances: dict, all_players: pd.DataFram
     top_df = pd.DataFrame.from_dict(player_distances, orient='index', columns=['distance'])
     top_df = top_df.merge(all_players, how='inner', left_index=True, right_index=True)[['distance', 'Name']]
     top_df['Selected Player'] = all_players.ix[selected_player_id]['Name']
-    top_df = top_df.sort_values('distance', ascending=False)
     top_df = top_df.head(recommendations_num)
     return top_df
 
 
 def get_top_similarities(df: pd.DataFrame, selected_players: pd.DataFrame, recommendations_num=5,
                          distance_func=eval_cosine_dist) -> pd.DataFrame:
+    """
+    :param df: Pool of players to compare to
+    :param selected_players: Players to be similar to
+    :param recommendations_num: Number of top similar players to selected players to show
+    :param distance_func:
+    :return: Top similar players to selected players comparison dataframe
+    """
     if recommendations_num > len(df) - 1:
         recommendations_num = len(df) - 1
     # clean df to stay with numeric only:
@@ -151,17 +186,17 @@ def generate_weights(player):
     if player_pos in DEFENDERS:
         for feature in axes:
             index = DEFENDERS_WEIGHTS_SORT.index(feature)
-            weight_val =  axes_length - index
+            weight_val = axes_length - index
             weights.append(weight_val**5)
     elif player_pos in MIDFIELDERS:
         for feature in axes:
             index = MIDFIELDERS_WEIGHTS_SORT.index(feature)
-            weight_val =  axes_length - index
+            weight_val = axes_length - index
             weights.append(weight_val**4)
     elif player_pos in FORWARDS:
         for feature in axes:
             index = FORWARDS_WEIGHTS_SORT.index(feature)
-            weight_val =  axes_length - index
+            weight_val = axes_length - index
             weights.append(weight_val**4)
     elif player_pos in GOALKEEPERS:
         pass
@@ -184,13 +219,14 @@ def generate_weights(player):
 # Usage example:
 # ------------------------------------------
 def run_example(df):
+    original_df = pd.DataFrame(df).set_index('ID')
     df = pre_process(df)
-    players = ['Sergio Ramos']
+    players = ['L. Messi', 'Cristiano Ronaldo']
     chosen_players = get_players(df, players)
-    top_similiar = get_top_similarities(df, chosen_players, recommendations_num=5, distance_func=eval_cosine_dist)
-
+    top_similiar = get_top_similarities(df, chosen_players, recommendations_num=25, distance_func=eval_cosine_dist)
+    top_similiar = top_similiar.merge(original_df[['Release Clause']], how='left', left_index=True, right_index=True)
+    top_similiar = top_similiar.sort_values(['Selected Player', 'distance'], ascending=False)
     print(top_similiar)
-    print()
 
 
 fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
