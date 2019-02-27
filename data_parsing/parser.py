@@ -1,14 +1,13 @@
 import pandas as pd
 import math, data_parsing.utils as utils
-from sklearn.metrics.pairwise import cosine_similarity, manhattan_distances
+from scipy.spatial import distance
 
 # Constants
 # ------------------------------------------
 UNWANTED_COLS = ['Special', 'International Reputation', 'Jersey Number', 'Joined', 'Release Clause']
 
-SIMPLE_PLAYER_VECTOR = ['Name', 'ID', 'Height', 'Work Rate', 'Weak Foot', 'Skill Moves', 'Crossing', 'Finishing',
-                        'HeadingAccuracy',
-                        'ShortPassing', 'Volleys', 'Dribbling', 'Curve', 'FKAccuracy',
+SIMPLE_PLAYER_VECTOR = ['Name', 'ID', 'Position', 'Height', 'Work Rate', 'Weak Foot', 'Skill Moves', 'Crossing',
+                        'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys', 'Dribbling', 'Curve', 'FKAccuracy',
                         'LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility', 'Reactions', 'Balance',
                         'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots', 'Aggression', 'Interceptions',
                         'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking', 'StandingTackle', 'SlidingTackle']
@@ -22,7 +21,11 @@ SIMPLE_GK_PLAYER_VECTOR = ['Name', 'ID', 'Crossing', 'Finishing', 'HeadingAccura
                            'SlidingTackle', 'GKDiving'
                                             'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']
 
-SIMPLE_PLAYER_VECTOR_NUMS_RATING = ['Weak Foot', 'Skill Moves', 'Height', 'Weight']
+# https://gaming.stackexchange.com/questions/167318/what-do-fifa-14-position-acronyms-mean
+DEFENDERS = ['CB', 'LCB', 'RCB', 'LB', 'RB', 'LWB', 'RWB', 'LB']
+MIDFIELDERS = ['CM', 'LDM', 'LAM', 'RDM', 'RAM', 'CDM', 'CAM', 'LM', 'RM', 'LCM', 'RCM']
+FORWARDS = ['ST', 'CF', 'LW', 'RW', 'LS', 'RS', 'LF', 'RF']
+GOALKEEPERS = ['GK']
 
 
 # ------------------------------------------
@@ -76,30 +79,42 @@ def pre_process(df, goalkeeper=False, features=SIMPLE_PLAYER_VECTOR):
 
 
 def get_players(df, lst) -> pd.DataFrame:
-    return df.loc[df['Name'].isin(lst)]
+    return get_rows_with_col_val(df, 'Name', lst)
+
+
+def get_rows_with_col_val(df, col, lst_val):
+    """
+    Returns rows with values that fit for given column
+    e.g: gets all players from DF with Position (col) of DF, RB, CD (lst_val)
+    """
+    return df.loc[df[col].isin(lst_val)]
+
+
+def get_same_position(df, player_id) -> pd.DataFrame:
+    pos = df.loc[player_id]['Position']
+    if pos in DEFENDERS:
+        return get_rows_with_col_val(df, 'Position', DEFENDERS)
+    elif pos in MIDFIELDERS:
+        return get_rows_with_col_val(df, 'Position', MIDFIELDERS)
+    elif pos in FORWARDS:
+        return get_rows_with_col_val(df, 'Position', FORWARDS)
+    elif pos in GOALKEEPERS:
+        return get_rows_with_col_val(df, 'Position', GOALKEEPERS)
+    else:
+        raise Exception("Bad position given")
+
 
 # ------------------------------------------
 # DISTANCE METHODS:
 # ------------------------------------------
 
-def eval_cosine_dist(player1, player2):
-    """
-    SKLearn cosine distance
-    :param player1:
-    :param player2:
-    :return:
-    """
-    return cosine_similarity([player1], [player2])[0][0]
+def eval_cosine_dist(player1, player2, w=None):
+    # w1, w2...wn represents v1, v2...vn
+    return 1 - distance.cosine(player1.values, player2.values, w=w)  # sim == (1 - cos.dst)
 
 
-def eval_manhatan_dist(player1, player2):
-    """
-    SKLearn manhattan distance
-    :param player1:
-    :param player2:
-    :return:
-    """
-    return manhattan_distances([player1], [player2])[0][0]
+def eval_manhatan_dist(player1, player2, w=None):
+    return distance.cityblock(player1.values, player2.values, w=w)
 
 
 # ------------------------------------------
@@ -108,15 +123,10 @@ def eval_manhatan_dist(player1, player2):
 
 def compute_distance(all_players: pd.DataFrame, selected_players: pd.DataFrame, distance_func=eval_cosine_dist) -> dict:
     """
-    :param all_players: All players
-    :param selected_players: Players of interest
-    :param distance_func:
-    :return: dictionary of dictionaries:
-                To access the distance of player1 from player2 do:
+    Computes distance for given data frames
+    :return: dictionary of dictionaries: To access the distance of player1 from player2 do:
                 player_distances[player1_id][player2_id]
     """
-    all_players = all_players.drop(columns=['Name']).dropna()
-    selected_players = selected_players.drop(columns=['Name']).dropna()
     player_distances = dict()
     for i, player1 in selected_players.iterrows():
         player_distances[i] = dict()
@@ -132,11 +142,6 @@ def get_top_similarities_helper(player_distances: dict, all_players: pd.DataFram
                                 recommendations_num) -> pd.DataFrame:
     """
     Compares one player to all players by distances
-    :param player_distances:
-    :param all_players:
-    :param selected_player_id:
-    :param recommendations_num:
-    :return:
     """
     top_df = pd.DataFrame.from_dict(player_distances, orient='index', columns=['distance'])
     top_df = top_df.merge(all_players, how='inner', left_index=True, right_index=True)[['distance', 'Name']]
@@ -146,23 +151,25 @@ def get_top_similarities_helper(player_distances: dict, all_players: pd.DataFram
     return top_df
 
 
-def get_top_similarities(all_players: pd.DataFrame, selected_players: pd.DataFrame, recommendations_num=5,
+def get_top_similarities(df: pd.DataFrame, selected_players: pd.DataFrame, recommendations_num=5,
                          distance_func=eval_cosine_dist) -> pd.DataFrame:
-    """
-    :param all_players: 5
-    :param selected_players:
-    :param recommendations_num:
-    :param distance_func:
-    :return:
-    """
-    if recommendations_num > len(all_players) - 1:
-        recommendations_num = len(all_players) - 1
+    if recommendations_num > len(df) - 1:
+        recommendations_num = len(df) - 1
+    # clean df to stay with numeric only:
+    all_players = df.drop(columns=['Name', 'Position']).dropna()
+    selected_players = selected_players.drop(columns=['Name', 'Position']).dropna()
+    # compute:
     distances = compute_distance(all_players, selected_players, distance_func)
     top_similarities_list = []
     for selected_player_id in distances.keys():
-        top_similarities_list.append(get_top_similarities_helper(distances[selected_player_id], all_players,
+        same_pos_players = get_same_position(df, selected_player_id)
+        top_similarities_list.append(get_top_similarities_helper(distances[selected_player_id], same_pos_players,
                                                                  selected_player_id, recommendations_num))
     return pd.concat(top_similarities_list)
+
+
+def generate_weights(player):
+    pass
 
 
 # ------------------------------------------
@@ -176,6 +183,7 @@ def run_example(df):
 
     print(top_similiar)
     print()
+
 
 fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
 run_example(fifa_df)
