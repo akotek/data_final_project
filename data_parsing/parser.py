@@ -1,31 +1,6 @@
-import pandas as pd
-import math, data_parsing.utils as utils
 from scipy.spatial import distance
-
-# Constants
-# ------------------------------------------
-UNWANTED_COLS = ['Special', 'International Reputation', 'Jersey Number', 'Joined', 'Release Clause']
-
-SIMPLE_PLAYER_VECTOR = ['Name', 'ID', 'Position', 'Height', 'Work Rate', 'Weak Foot', 'Skill Moves', 'Crossing',
-                        'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys', 'Dribbling', 'Curve', 'FKAccuracy',
-                        'LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility', 'Reactions', 'Balance',
-                        'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots', 'Aggression', 'Interceptions',
-                        'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking', 'StandingTackle', 'SlidingTackle']
-
-SIMPLE_GK_PLAYER_VECTOR = ['Name', 'ID', 'Crossing', 'Finishing', 'HeadingAccuracy',
-                           'ShortPassing', 'Volleys', 'Dribbling', 'Curve', 'FKAccuracy',
-                           'LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility', 'Reactions',
-                           'Balance',
-                           'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots', 'Aggression', 'Interceptions',
-                           'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking', 'StandingTackle',
-                           'SlidingTackle', 'GKDiving'
-                                            'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']
-
-# https://gaming.stackexchange.com/questions/167318/what-do-fifa-14-position-acronyms-mean
-DEFENDERS = ['CB', 'LCB', 'RCB', 'LB', 'RB', 'LWB', 'RWB', 'LB']
-MIDFIELDERS = ['CM', 'LDM', 'LAM', 'RDM', 'RAM', 'CDM', 'CAM', 'LM', 'RM', 'LCM', 'RCM']
-FORWARDS = ['ST', 'CF', 'LW', 'RW', 'LS', 'RS', 'LF', 'RF']
-GOALKEEPERS = ['GK']
+import data_parsing.utils as utils
+from data_parsing.constants import *
 
 
 # ------------------------------------------
@@ -79,27 +54,19 @@ def pre_process(df, goalkeeper=False, features=SIMPLE_PLAYER_VECTOR):
 
 
 def get_players(df, lst) -> pd.DataFrame:
-    return get_rows_with_col_val(df, 'Name', lst)
-
-
-def get_rows_with_col_val(df, col, lst_val):
-    """
-    Returns rows with values that fit for given column
-    e.g: gets all players from DF with Position (col) of DF, RB, CD (lst_val)
-    """
-    return df.loc[df[col].isin(lst_val)]
+    return utils.get_rows_with_col_val(df, 'Name', lst)
 
 
 def get_same_position(df, player_id) -> pd.DataFrame:
     pos = df.loc[player_id]['Position']
     if pos in DEFENDERS:
-        return get_rows_with_col_val(df, 'Position', DEFENDERS)
+        return utils.get_rows_with_col_val(df, 'Position', DEFENDERS)
     elif pos in MIDFIELDERS:
-        return get_rows_with_col_val(df, 'Position', MIDFIELDERS)
+        return utils.get_rows_with_col_val(df, 'Position', MIDFIELDERS)
     elif pos in FORWARDS:
-        return get_rows_with_col_val(df, 'Position', FORWARDS)
+        return utils.get_rows_with_col_val(df, 'Position', FORWARDS)
     elif pos in GOALKEEPERS:
-        return get_rows_with_col_val(df, 'Position', GOALKEEPERS)
+        return utils.get_rows_with_col_val(df, 'Position', GOALKEEPERS)
     else:
         raise Exception("Bad position given")
 
@@ -168,7 +135,19 @@ def get_top_similarities(df: pd.DataFrame, selected_players: pd.DataFrame, recom
     return pd.concat(top_similarities_list)
 
 
-def generate_weights(player):
+def generate_weights(df, player_id):
+    """
+    Heuristic to generate weights of players:
+    1. Sort features from existing similar players using - (7-of-the-most-uniquely-similar-players) article
+    2. Use f(x) = x to determine feature weights
+    See constants.py for detailed metrics
+    """
+    # TODO.........
+    pos = df.loc[player_id]['Position']
+    all_players = df.drop(columns=['Name', 'Position']).dropna()
+    idx_mat = np.arange(1, all_players.shape[0])
+    # if pos in DEFENDERS:
+    # DEFENDERS_WEIGHTS_SORT
     pass
 
 
@@ -187,3 +166,4 @@ def run_example(df):
 
 fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
 run_example(fifa_df)
+

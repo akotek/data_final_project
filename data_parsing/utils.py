@@ -52,3 +52,11 @@ def split_work_rate(x):
 
 def normalize(score, max_value, min_value, max_score=100):
     return max_score * (score - min_value) / (max_value - min_value)
+
+
+def get_rows_with_col_val(df, col, lst_val) -> pd.DataFrame:
+    """
+    Returns rows with values that fit for given column
+    e.g: gets all players from DF with Position (col) of DF, RB, CD (lst_val)
+    """
+    return df.loc[df[col].isin(lst_val)]

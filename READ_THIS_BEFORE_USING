@@ -4,19 +4,15 @@ https://www.kaggle.com/karangadiya/fifa19
 --------------------------------
 
 TODO (by priority - first- most important):
-0. Some of the features are more important for specific group of players,
-for example: for offence_players features that are more important for attacking shouldn't more weight when computing distance.
-1. Divide our data into 3 categories {offence_players, defence_players, goalkeepers}.
- When looking for a similar players to a player from a specific group we would like to consider
-  only players that belong to the same group as him.
+0. add weights to compute distance (artiyum)
 2. Clean the data, normalize the data, make use of additional columns which we didn't use until now, dummy variables.
 3. Find to do something more interesting, for example find players that are the most unique, players that are more far
  away from other players (players that stand out) and think of a way to visualize this (make a plot, clustering?).
-
-
 4. do more -- get players which are really 'different' -- very far away from players CLUSTERING??
 5. ASsociation rules to expand?
+6. similarity of goalkeepers (need to finish)
 
+TODO not sure ?? i put all normalized/moduled data by Omer in last phases of constants
 
 THINGS TO WRITE FOR ENDING PDF
 -------------------
