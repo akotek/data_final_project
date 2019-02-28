@@ -7,8 +7,7 @@ from data_parsing.constants import *
 # GENERAL:
 # ------------------------------------------
 
-
-def pre_process(df, goalkeeper=False, features=SIMPLE_PLAYER_VECTOR):
+def pre_process(df, goalkeeper=False, features=PLAYER_FEATURES_VECTOR):
     """
     cleaning the pandas data frame by removing duplicates name, unwanted columns
     :param features:
@@ -38,14 +37,7 @@ def pre_process(df, goalkeeper=False, features=SIMPLE_PLAYER_VECTOR):
         df['Weight'] = df['Weight'].apply(lambda x: utils.normalize(x, max_value, min_value))
     # print('max: ', df['Height'].max(), ' min: ', df['Height'].min())
     print('totals values: ' + str(len(df['Name'])))
-    if goalkeeper:
-        df = df[df["Position"] == 'GK']
-        df = df[features]
-    else:
-        df = df[df["Position"] != 'GK']
-        df = df[features]
-    df = df.drop_duplicates(subset=['Name'])
-
+    df = df[features]
     print('unique names: ' + str(len(df['Name'])))
     print('after droping null values: ' + str(len(df['ID'])))
     df.set_index('ID', drop=True, inplace=True)
@@ -60,7 +52,12 @@ def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
     :param df:
     :return:
     """
-    return (df - df.mean()) / df.std()
+    if len(df) == 0:
+        return df
+    try:
+        return (df - df.mean()) / df.std()
+    except:
+        return df
 
 
 def normalize_data(original_df: pd.DataFrame) -> pd.DataFrame:
@@ -73,7 +70,8 @@ def normalize_data(original_df: pd.DataFrame) -> pd.DataFrame:
     df_defenders = utils.get_rows_with_col_val(original_df, 'Position', DEFENDERS)
     df_midfielders = utils.get_rows_with_col_val(original_df, 'Position', MIDFIELDERS)
     df_forwards = utils.get_rows_with_col_val(original_df, 'Position', FORWARDS)
-    df_list = [df_defenders, df_midfielders, df_forwards]
+    df_gk = utils.get_rows_with_col_val(original_df, 'Position', GOALKEEPERS)
+    df_list = [df_defenders, df_midfielders, df_forwards,df_gk]
     for i in range(len(df_list)):
         df_list[i] = normalize_df(df_list[i].drop(['Name', 'Position'], axis=1))
     normalized_df = pd.concat(df_list)
@@ -111,6 +109,9 @@ def eval_cosine_dist(player1, player2, w=None):
 def eval_manhatan_dist(player1, player2, w=None):
     return distance.cityblock(player1.values, player2.values, w=w)
 
+def eval_euclidean_dist(player1, player2, w=None):
+    return distance.euclidean(player1.values, player2.values, w=w)
+
 
 # ------------------------------------------
 # ALGORITHM:
@@ -125,14 +126,21 @@ def compute_distance(all_players: pd.DataFrame, selected_players: pd.DataFrame, 
     player_distances = dict()
     for i, player1 in selected_players.iterrows():
         player_distances[i] = dict()
-        # weights = generate_weights(player1)
-        weights = None
+        use_weights = False
+        if use_weights:
+            weights = generate_weights(player1)
+        else:
+            weights = None
+        filterd_all_players = all_players
+        if player1['Position'] != 'GK':
+            filterd_all_players = all_players.drop(columns=GK_EXTRA_FEATURES,errors='ignore')
+            player1 = player1.drop(labels=GK_EXTRA_FEATURES,errors='ignore')
         player1 = player1.drop(labels=['Position', 'Name']).dropna().astype('float64')
-        for j, player2 in all_players.iterrows():
+        for j, player2 in filterd_all_players.iterrows():
             if i != j:
                 distance = distance_func(player1, player2, weights)
                 player_distances[i][j] = distance
-                print(i, j, distance)
+                # print(i, j, distance)
     return player_distances
 
 
@@ -174,14 +182,13 @@ def get_top_similarities(df: pd.DataFrame, selected_players: pd.DataFrame, recom
 
 def generate_weights(player):
     """
-    Heuristic to generate weights of players:
-    1. Sort features from existing similar players using - (7-of-the-most-uniquely-similar-players) article
-    2. Use f(x) = x to determine feature weights
-    See constants.py for detailed metrics
+    generate weights for the diffrant features of the the given player
+    :param player: the player we want to generate weights
+    :return: a vector of weights
     """
     player_pos = player['Position']
     axes = (player.drop(labels = ['Position','Name']).axes)[0]
-    axes_length = len(axes)
+    axes_length = MAX_FEATURES_LEN
     weights = list()
     if player_pos in DEFENDERS:
         for feature in axes:
@@ -199,35 +206,92 @@ def generate_weights(player):
             weight_val = axes_length - index
             weights.append(weight_val**4)
     elif player_pos in GOALKEEPERS:
-        pass
-        #TODO
+        for feature in axes:
+            axes_length += GK_EXTRA_LEN
+            index = GOALKEPPER_WEIGHTS_SORT.index(feature)
+            weight_val = axes_length - index
+            weights.append(weight_val ** 4)
     else:
         return None
     return weights
 
 
-    # TODO.........
-    # pos = df.loc[player_id]['Position']
-    # all_players = df.drop(columns=['Name', 'Position']).dropna()
-    # idx_mat = np.arange(1, all_players.shape[0])
-    # if pos in DEFENDERS:
-    # DEFENDERS_WEIGHTS_SORT
-    pass
 
 
 # ------------------------------------------
 # Usage example:
 # ------------------------------------------
 def run_example(df):
+    pd.set_option('display.expand_frame_repr', False)
+    eval_func, players = get_user_input()
     original_df = pd.DataFrame(df).set_index('ID')
-    df = pre_process(df)
-    players = ['L. Messi', 'Cristiano Ronaldo']
+    original_df = original_df.drop_duplicates(subset=['Name'])
+    gk_players, other_players = split_player_type(original_df, players)
+    if len(gk_players):
+        player_type_df = df[df['Position'] == 'GK']
+        player_type_df.is_copy = False
+        find_similar_players(player_type_df, gk_players, original_df,
+                             GK_PLAYER_FEATURES_VECTOR,eval_func)
+    if len(other_players):
+        player_type_df = df[df['Position'] != 'GK']
+        player_type_df.is_copy = False
+        find_similar_players(player_type_df, other_players, original_df,
+                             PLAYER_FEATURES_VECTOR,eval_func)
+
+
+def get_user_input():
+    names = input("players you want to computer?, spare them by comma\n")
+    names = names.split(",")
+    players = list()
+    for name in names:
+        players.append(name.strip())
+    func = input("which distance function you want to use: Cosine,"
+                 " Manhattan or Euclidean?\n")
+    func = func.strip().lower()
+    if func == 'manhattan':
+        eval_func = eval_manhatan_dist
+        print("you chose Manhattan")
+    elif func == 'euclidean':
+        eval_func = eval_euclidean_dist
+        print("you chose Euclidean")
+    else:
+        eval_func = eval_cosine_dist
+        print("you chose Cosine")
+    return eval_func, players
+
+
+def split_player_type(original_df, players):
+    """
+    split a list of players to goalkeppers and other kind of players
+    :return: 2 list of players sname
+    """
+    gk_players = list()
+    other_players = list()
+    for player in players:
+        if original_df[original_df['Name'] == player]['Position'].eq('GK').any():
+            gk_players.append(player)
+        else:
+            other_players.append(player)
+    return gk_players, other_players
+
+
+def find_similar_players(df, players, original_df, feature_vector, eval_dist_func=eval_cosine_dist):
+    """
+    find similar player to the list of players using the feature vector
+    :param df: the dataframe of all the players
+    :param players: the list of players
+    :param original_df: the original df to merge and find other values
+    :param feature_vector: the feature vector we want to calculate the distance
+    :param eval_dist_func: the chosen distance function
+    """
+    df = pre_process(df, features=feature_vector)
     chosen_players = get_players(df, players)
-    top_similiar = get_top_similarities(df, chosen_players, recommendations_num=25, distance_func=eval_cosine_dist)
-    top_similiar = top_similiar.merge(original_df[['Release Clause']], how='left', left_index=True, right_index=True)
+    top_similiar = get_top_similarities(df, chosen_players, recommendations_num=25,
+                                        distance_func=eval_dist_func)
+    top_similiar = top_similiar.merge(original_df[['Release Clause','Overall']], how='left', left_index=True,
+                                      right_index=True)
     top_similiar = top_similiar.sort_values(['Selected Player', 'distance'], ascending=False)
     print(top_similiar)
-
 
 fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
 run_example(fifa_df)
