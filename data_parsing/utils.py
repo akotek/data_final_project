@@ -60,3 +60,18 @@ def get_rows_with_col_val(df, col, lst_val) -> pd.DataFrame:
     e.g: gets all players from DF with Position (col) of DF, RB, CD (lst_val)
     """
     return df.loc[df[col].isin(lst_val)]
+
+
+def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalize DF to std=1 mean=0
+    Make sure that df has only numeric variables
+    :param df:
+    :return:
+    """
+    if len(df) == 0:
+        return df
+    try:
+        return (df - df.mean()) / df.std()
+    except:
+        return df
