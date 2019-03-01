@@ -17,6 +17,22 @@ def get_data(query) -> pd.DataFrame:
     return df
 
 
+def get_player_attributes():
+    query = """SELECT *
+               FROM Player_Attributes
+            """
+    df = get_data(query)
+    return df
+
+
+def get_team_attributes():
+    query = """SELECT *
+                   FROM Team_Attributes
+                """
+    df = get_data(query)
+    return df
+
+
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df.dropna(inplace=True)
     return df
