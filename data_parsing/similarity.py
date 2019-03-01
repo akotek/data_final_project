@@ -1,11 +1,9 @@
 from scipy.spatial import distance
 import data_parsing.utils as utils
-import data_parsing.clustering as clustering
 from data_parsing.constants import *
 
 USE_WEIGHTS = True
 RECOMMENDATION_NUM = 4
-
 
 # ------------------------------------------
 # GENERAL:
@@ -48,21 +46,6 @@ def pre_process(df, features=PLAYER_FEATURES_VECTOR):
     return df
 
 
-def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Normalize DF to std=1 mean=0
-    Make sure that df has only numeric variables
-    :param df:
-    :return:
-    """
-    if len(df) == 0:
-        return df
-    try:
-        return (df - df.mean()) / df.std()
-    except:
-        return df
-
-
 def normalize_data(original_df: pd.DataFrame) -> pd.DataFrame:
     """
     Normalizes the data separately for every type of players
@@ -76,7 +59,7 @@ def normalize_data(original_df: pd.DataFrame) -> pd.DataFrame:
     df_gk = utils.get_rows_with_col_val(original_df, 'Position', GOALKEEPERS)
     df_list = [df_defenders, df_midfielders, df_forwards, df_gk]
     for i in range(len(df_list)):
-        df_list[i] = normalize_df(df_list[i].drop(['Name', 'Position'], axis=1))
+        df_list[i] = utils.normalize_df(df_list[i].drop(['Name', 'Position'], axis=1))
     normalized_df = pd.concat(df_list)
     original_df = original_df[['Name', 'Position']].merge(normalized_df, left_index=True, right_index=True)
     return original_df
@@ -222,58 +205,6 @@ def generate_weights(player):
 # ------------------------------------------
 # Usage example:
 # ------------------------------------------
-def run_similarity(df):
-    pd.set_option('display.expand_frame_repr', False)
-    eval_func, players = get_user_input()
-    original_df = pd.DataFrame(df).set_index('ID')
-    original_df = original_df.drop_duplicates(subset=['Name'])
-    gk_players, other_players = split_player_type(original_df, players)
-    if len(gk_players):
-        player_type_df = df[df['Position'] == 'GK']
-        player_type_df.is_copy = False
-        find_similar_players(player_type_df, gk_players, original_df,
-                             GK_PLAYER_FEATURES_VECTOR, eval_func)
-    if len(other_players):
-        player_type_df = df[df['Position'] != 'GK']
-        player_type_df.is_copy = False
-        find_similar_players(player_type_df, other_players, original_df,
-                             PLAYER_FEATURES_VECTOR, eval_func)
-
-
-def get_user_input():
-    names = input("players you want to computer?, spare them by comma\n")
-    names = names.split(",")
-    players = list()
-    for name in names:
-        players.append(name.strip())
-    func = input("which distance function you want to use: Cosine,"
-                 " Manhattan or Euclidean?\n")
-    func = func.strip().lower()
-    if func == 'manhattan':
-        eval_func = eval_manhatan_dist
-        print("you chose Manhattan")
-    elif func == 'euclidean':
-        eval_func = eval_euclidean_dist
-        print("you chose Euclidean")
-    else:
-        eval_func = eval_cosine_dist
-        print("you chose Cosine")
-    return eval_func, players
-
-
-def split_player_type(original_df, players):
-    """
-    split a list of players to goalkeppers and other kind of players
-    :return: 2 list of players sname
-    """
-    gk_players = list()
-    other_players = list()
-    for player in players:
-        if original_df[original_df['Name'] == player]['Position'].eq('GK').any():
-            gk_players.append(player)
-        else:
-            other_players.append(player)
-    return gk_players, other_players
 
 
 def find_similar_players(df, players, original_df, feature_vector, eval_dist_func=eval_cosine_dist):
@@ -294,11 +225,3 @@ def find_similar_players(df, players, original_df, feature_vector, eval_dist_fun
     top_similiar = top_similiar.sort_values(['Selected Player', 'distance'], ascending=False)
     print(top_similiar)
     return top_similiar
-
-
-def run_clustering(df):
-    # df = pre_process(df)
-    clustering.cluster(df)
-
-fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
-run_similarity(fifa_df)

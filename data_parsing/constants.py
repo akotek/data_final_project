@@ -3,24 +3,24 @@ from data_parsing.utils import *
 # ------------------------------------------
 # Constants
 # ------------------------------------------
-
-PLAYER_FEATURES_VECTOR = ['Name', 'ID', 'Position', 'Height', 'Work Rate', 'Weak Foot', 'Skill Moves', 'Crossing',
-                          'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys', 'Dribbling', 'Curve', 'FKAccuracy',
-                          'LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility', 'Reactions',
-                          'Balance',
+# main features are one which are given to csv with [1, 100] scale
+FIFA_MAIN_FEATURES = ['Crossing', 'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys', 'Dribbling', 'Curve', 'FKAccuracy',
+                          'LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility', 'Reactions', 'Balance',
                           'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots', 'Aggression', 'Interceptions',
-                          'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking', 'StandingTackle',
-                          'SlidingTackle']
+                          'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking', 'StandingTackle', 'SlidingTackle']
+
+PLAYER_FEATURES_VECTOR = ['Name', 'ID', 'Position', 'Height', 'Work Rate', 'Weak Foot', 'Skill Moves'] + FIFA_MAIN_FEATURES
+
+GK_EXTRA_FEATURES = ['GKDiving', 'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']
 
 GK_PLAYER_FEATURES_VECTOR = ['Name', 'ID', 'Position', 'Height', 'Weak Foot', 'Crossing',
                              'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys', 'Dribbling', 'Curve',
-                             'FKAccuracy',
-                             'LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility', 'Reactions',
-                             'Balance',
-                             'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots', 'Aggression', 'Interceptions',
-                             'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking', 'StandingTackle',
-                             'SlidingTackle', 'GKDiving', 'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']
+                             'FKAccuracy','LongPassing', 'BallControl', 'Acceleration', 'SprintSpeed', 'Agility',
+                             'Reactions', 'Balance','ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots',
+                             'Aggression', 'Interceptions', 'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking',
+                             'StandingTackle', 'SlidingTackle'] + GK_EXTRA_FEATURES
 
+CLUSTERING_PLAYER_FEATURES_VECTOR = ['Name', 'ID'] + FIFA_MAIN_FEATURES + GK_EXTRA_FEATURES
 # ------------------------------------------
 # Positions
 # ------------------------------------------
@@ -67,8 +67,6 @@ GOALKEPPER_WEIGHTS_SORT = ['GKDiving', 'GKHandling', 'GKKicking', 'GKPositioning
                            'Jumping', 'Stamina', 'Height', 'Agility', 'Finishing', 'Dribbling', 'Skill Moves',
                            'Acceleration', 'Weak Foot', 'FKAccuracy', 'attacking work rate']
 MAX_FEATURES_LEN = 34
-
-GK_EXTRA_FEATURES = ['GKDiving', 'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']
 
 GK_EXTRA_LEN = 5
 
