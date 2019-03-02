@@ -10,7 +10,7 @@ def split_to_train_and_test():
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.9)
     return X_train, X_test, y_train, y_test
 
-
+#
 if __name__ == "__main__":
     split_to_train_and_test()
 
