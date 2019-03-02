@@ -18,19 +18,19 @@ def get_data(query) -> pd.DataFrame:
 
 
 def get_player_attributes():
-    query = """SELECT *
+    query = """SELECT *, strftime('%Y', date) as year
                FROM Player_Attributes
             """
     df = get_data(query)
-    return df
+    return df.drop('date', axis=1)
 
 
 def get_team_attributes():
-    query = """SELECT *
+    query = """SELECT *, strftime('%Y', date) as year
                    FROM Team_Attributes
                 """
     df = get_data(query)
-    return df
+    return df.drop('date', axis=1)
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
