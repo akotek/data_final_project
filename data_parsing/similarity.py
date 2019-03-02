@@ -3,7 +3,8 @@ import data_parsing.utils as utils
 from data_parsing.constants import *
 
 USE_WEIGHTS = True
-RECOMMENDATION_NUM = 4
+RECOMMENDATION_NUM = 10
+
 
 # ------------------------------------------
 # GENERAL:
@@ -223,5 +224,4 @@ def find_similar_players(df, players, original_df, feature_vector, eval_dist_fun
     top_similiar = top_similiar.merge(original_df[['Release Clause', 'Overall']], how='left', left_index=True,
                                       right_index=True)
     top_similiar = top_similiar.sort_values(['Selected Player', 'distance'], ascending=False)
-    print(top_similiar)
     return top_similiar

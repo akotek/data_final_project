@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 from data_parsing.constants import *
 import data_parsing.utils as utils
+from wordcloud import WordCloud
 
 # ------------------------------------------
 # Constants to configure plotting
@@ -33,4 +34,12 @@ def plot_clustering(clst_df):
     plt.legend(["Cluster 0", "Cluster 1", "Cluster 2", "Cluster 3"], loc=4)
     plt.xlabel("PC1")
     plt.ylabel("PC2")
+    plt.show()
+
+
+def plot_tag_clouds(freq_dict):
+    wcloud = WordCloud(relative_scaling=1)  # rel scaling between 0,1
+    wcloud = wcloud.generate_from_frequencies(frequencies=freq_dict)
+    plt.imshow(wcloud, interpolation='bilinear')
+    plt.axis("off")
     plt.show()

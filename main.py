@@ -4,28 +4,42 @@ import data_parsing.visualization as visualizer
 
 NUM_OF_CLUSTERS = 4
 
+
 # Similarity:
 # ------------------------------------------
+
+def plot_similarity(df):
+    sim, players = run_similarity(df)
+    freq_dict = sim.set_index('Name').to_dict()['distance']
+    for p in players:
+        freq_dict[p] = 1
+    visualizer.plot_tag_clouds(freq_dict)
+
+
 def run_similarity(df):
     pd.set_option('display.expand_frame_repr', False)
     eval_func, players = get_user_input()
+    eval_func = eval_cosine_dist
     original_df = pd.DataFrame(df).set_index('ID')
     original_df = original_df.drop_duplicates(subset=['Name'])
     gk_players, other_players = split_player_type(original_df, players)
+    sim = pd.DataFrame()
     if len(gk_players):
         player_type_df = df[df['Position'] == 'GK']
         player_type_df.is_copy = False
-        find_similar_players(player_type_df, gk_players, original_df,
-                             GK_PLAYER_FEATURES_VECTOR, eval_func)
+        sim = find_similar_players(player_type_df, gk_players, original_df,
+                                   GK_PLAYER_FEATURES_VECTOR, eval_func)
     if len(other_players):
         player_type_df = df[df['Position'] != 'GK']
         player_type_df.is_copy = False
-        find_similar_players(player_type_df, other_players, original_df,
-                             PLAYER_FEATURES_VECTOR, eval_func)
+        sim = find_similar_players(player_type_df, other_players, original_df,
+                                   PLAYER_FEATURES_VECTOR, eval_func)
+    print(sim)
+    return sim, players
 
 
 def get_user_input():
-    names = input("players you want to computer?, spare them by comma\n")
+    names = input("Enter player/s name you want to compute, spare them by comma\n")
     names = names.split(",")
     players = list()
     for name in names:
@@ -79,7 +93,6 @@ def run_clustering(df):
     processed_df, transformed_df = run_pca(df)
     labels, C, clusters = clustering.cluster(transformed_df, NUM_OF_CLUSTERS)
     transformed_df['Cluster'] = clusters
-    # transformed_df['Name'] = df['Name']
     print(transformed_df.head())
     return processed_df, transformed_df
 
@@ -88,13 +101,13 @@ def plot_clustering(df):
     prcss_df, clstr_df = run_clustering(df)
     visualizer.plot_clustering(clstr_df)
 
-def run_tsne(df):
-    pass
+
 # ------------------------------------------
 
 if __name__ == "__main__":
     fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
     # run_similarity(fifa_df)
+    # plot_similarity(fifa_df)
     # plot_pca(fifa_df)
     # plot_clustering(fifa_df)
     # run_clustering(fifa_df)
