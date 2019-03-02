@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from data_parsing.transfer_db_processing import get_player_attributes, get_team_attributes
+from predictor.transfer_db_processing import get_player_attributes, get_team_attributes
 
 PLAYERS_DF = pd.read_csv(os.path.join('csv', 'player_team_table.csv'))
 TRANSFER_COLUMNS = ['player_id', 'previous_team_id', 'next_team_id', 'start_year_previous_team', 'start_year_next_team',

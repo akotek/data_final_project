@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from data_parsing.transfer_db_processing import get_team_attributes
+from predictor.transfer_db_processing import get_team_attributes
 
 
 TEAM_ATTRIBUTES = get_team_attributes()

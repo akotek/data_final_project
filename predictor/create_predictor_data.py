@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from data_parsing.player_attributes_parsing import players_mean_by_year_helper
+from predictor.player_attributes_parsing import players_mean_by_year_helper
 
 
 def get_player_vector(player_years: list, player: pd.DataFrame):

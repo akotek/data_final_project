@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from data_parsing.transfer_db_processing import get_player_attributes
+from predictor.transfer_db_processing import get_player_attributes
 
 PLAYER_ATTRIBUTES_DF = get_player_attributes()
 
