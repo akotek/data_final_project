@@ -1,5 +1,6 @@
 from data_parsing.similarity import *
 import data_parsing.clustering as clustering
+import data_parsing.visualization as visualizer
 
 NUM_OF_CLUSTERS = 4
 
@@ -61,17 +62,39 @@ def split_player_type(original_df, players):
 
 # Clustering
 # ------------------------------------------
+def run_pca(df):
+    processed_df = clustering.pre_process(df)  # diff pre processing than similarity one
+    norm_df = clustering.normalize(processed_df)
+    transformed_df = clustering.pca(norm_df, 2)
+    return processed_df, transformed_df
+
+
+def plot_pca(df):
+    prcss_df, trnsf_df = run_pca(df)
+    visualizer.plot_pca(prcss_df, trnsf_df)
+
+
 def run_clustering(df):
-    df = clustering.pre_process(df)  # diff pre processing than similarity one
-    transformed_df = clustering.pca(df, 2)
-    clustering.cluster(transformed_df, NUM_OF_CLUSTERS)
-    # TODO add 'names' later dependant on ID
+    # Builds data with cluster column and name column
+    processed_df, transformed_df = run_pca(df)
+    labels, C, clusters = clustering.cluster(transformed_df, NUM_OF_CLUSTERS)
+    transformed_df['Cluster'] = clusters
+    # transformed_df['Name'] = df['Name']
+    print(transformed_df.head())
+    return processed_df, transformed_df
 
 
+def plot_clustering(df):
+    prcss_df, clstr_df = run_clustering(df)
+    visualizer.plot_clustering(clstr_df)
+
+def run_tsne(df):
+    pass
 # ------------------------------------------
 
 if __name__ == "__main__":
     fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
-    run_similarity(fifa_df)
-    # run clustering:
+    # run_similarity(fifa_df)
+    # plot_pca(fifa_df)
+    # plot_clustering(fifa_df)
     # run_clustering(fifa_df)

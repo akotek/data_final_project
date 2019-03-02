@@ -20,7 +20,7 @@ GK_PLAYER_FEATURES_VECTOR = ['Name', 'ID', 'Position', 'Height', 'Weak Foot', 'C
                              'Aggression', 'Interceptions', 'Positioning', 'Vision', 'Penalties', 'Composure', 'Marking',
                              'StandingTackle', 'SlidingTackle'] + GK_EXTRA_FEATURES
 
-CLUSTERING_PLAYER_FEATURES_VECTOR = ['Name', 'ID'] + FIFA_MAIN_FEATURES + GK_EXTRA_FEATURES
+CLUSTERING_PLAYER_FEATURES_VECTOR = ['Name', 'ID', 'Position'] + FIFA_MAIN_FEATURES + GK_EXTRA_FEATURES
 # ------------------------------------------
 # Positions
 # ------------------------------------------
