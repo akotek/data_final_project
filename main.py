@@ -102,6 +102,7 @@ def run_clustering(df):
 
 def plot_clustering(df):
     prcss_df, clstr_df = run_clustering(df)
+    df = pd.merge(prcss_df, clstr_df['Cluster'], )
     visualizer.plot_clustering(clstr_df)
 
 
@@ -123,7 +124,7 @@ def clusters_distribution(df: pd.DataFrame):
 
 if __name__ == "__main__":
     fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
-    # run_similarity(fifa_df)
+    run_similarity(fifa_df)
     # plot_similarity(fifa_df)
     # plot_pca(fifa_df)
     # plot_clustering(fifa_df)

@@ -2,13 +2,13 @@ from sklearn.cluster import KMeans
 from data_parsing.constants import *
 import data_parsing.utils as utils
 from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
-from sklearn.metrics import silhouette_samples, silhouette_score
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 
 def pre_process(df):
+    """
+    Pre process data before clustering
+    """
     df = df.dropna(how='all')
     df = df[CLUSTERING_PLAYER_FEATURES_VECTOR]
     df.set_index('ID', drop=True, inplace=True)
@@ -17,7 +17,9 @@ def pre_process(df):
 
 
 def normalize(df):
-    # standardize data before running pca/k-means
+    """
+    Standardize data before running pca/k-means
+    """
     return utils.normalize_df(df.drop(['Name', 'Position'], axis=1))
 
 
@@ -47,6 +49,9 @@ def cluster(df, k):
 
 
 def determine_num_of_clusters(df: pd.DataFrame):
+    """
+    Plots num of clusters to be used by elbow method
+    """
     df = pre_process(df).drop(['Name', 'Position'], axis=1)
     Sum_of_squared_distances = []
     K = range(1, 15)
@@ -59,8 +64,3 @@ def determine_num_of_clusters(df: pd.DataFrame):
     plt.ylabel('Sum_of_squared_distances')
     plt.title('Elbow Method For Optimal k')
     plt.show()
-
-
-def tsne(df, n):
-    ts = TSNE(n_components=n)
-    return ts.fit_transform(df)

@@ -12,6 +12,9 @@ DOTS_SIZE = 3
 
 # ------------------------------------------
 def plot_pca(orig_df, pc_df):
+    """
+    Plots pca
+    """
     position = [GOALKEEPERS, DEFENDERS, MIDFIELDERS, FORWARDS]
     for target, color in zip(position, COLORS):
         # in each iteration - get indices of specific position
@@ -26,6 +29,9 @@ def plot_pca(orig_df, pc_df):
 
 
 def plot_clustering(clst_df):
+    """
+    Plots clustering
+    """
     clusters = ['0', '1', '2', '3']
     for clst, color in zip(clusters, COLORS):
         indices = utils.get_rows_with_col_val(clst_df, 'Cluster', [clst]).index.values
@@ -38,6 +44,9 @@ def plot_clustering(clst_df):
 
 
 def plot_tag_clouds(freq_dict):
+    """
+    Plots tag clouds for similarity
+    """
     wcloud = WordCloud(relative_scaling=1)  # rel scaling between 0,1
     wcloud = wcloud.generate_from_frequencies(frequencies=freq_dict)
     plt.imshow(wcloud, interpolation='bilinear')

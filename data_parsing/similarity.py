@@ -71,6 +71,9 @@ def get_players(df, lst) -> pd.DataFrame:
 
 
 def get_same_position(df, player_id) -> pd.DataFrame:
+    """
+    Gets players in same position of given id
+    """
     pos = df.loc[player_id]['Position']
     if pos in DEFENDERS:
         return utils.get_rows_with_col_val(df, 'Position', DEFENDERS)
