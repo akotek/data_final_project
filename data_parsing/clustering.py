@@ -1,15 +1,17 @@
 from sklearn.cluster import KMeans
-
 from data_parsing.constants import *
 import data_parsing.utils as utils
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.metrics import silhouette_samples, silhouette_score
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 
 def pre_process(df):
+    df = df.dropna(how='all')
     df = df[CLUSTERING_PLAYER_FEATURES_VECTOR]
     df.set_index('ID', drop=True, inplace=True)
-    df = df.dropna(how='all')
     df = df.fillna(df.mean())
     return df
 
@@ -42,6 +44,22 @@ def cluster(df, k):
     C = kmeans.cluster_centers_
     clusters = kmeans.labels_.tolist()  # save this to original df
     return labels, C, clusters
+
+
+def determine_num_of_clusters(df: pd.DataFrame):
+    df = pre_process(df).drop(['Name', 'Position'], axis=1)
+    Sum_of_squared_distances = []
+    K = range(1, 15)
+    for k in K:
+        km = KMeans(n_clusters=k)
+        km = km.fit(df)
+        Sum_of_squared_distances.append(km.inertia_)
+    plt.plot(K, Sum_of_squared_distances, 'bx-')
+    plt.xlabel('k')
+    plt.ylabel('Sum_of_squared_distances')
+    plt.title('Elbow Method For Optimal k')
+    plt.show()
+
 
 def tsne(df, n):
     ts = TSNE(n_components=n)

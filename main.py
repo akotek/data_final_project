@@ -1,6 +1,9 @@
 from data_parsing.similarity import *
 import data_parsing.clustering as clustering
 import data_parsing.visualization as visualizer
+import matplotlib.pyplot as plt
+from data_parsing.clustering import determine_num_of_clusters
+
 
 NUM_OF_CLUSTERS = 4
 
@@ -102,6 +105,20 @@ def plot_clustering(df):
     visualizer.plot_clustering(clstr_df)
 
 
+def clusters_distribution(df: pd.DataFrame):
+    processed_df, transformed_df = run_clustering(df)
+    clustered_df = pd.merge(transformed_df['Cluster'], processed_df, left_index=True, right_index=True, how='inner')
+    num_of_positions = len(df['Position'].dropna().unique())
+    clusters = [clustered_df[clustered_df['Position'] == position] for position in df['Position'].dropna().unique()]
+    for position, position_name, number in zip(clusters, df['Position'].dropna().unique(), range(1, num_of_positions + 1)):
+        position['Cluster'].value_counts().plot(kind='bar', rot=0)
+        plt.title('Histogram of clusters of for position ' + position_name + ':')
+        plt.xlabel('Cluster Number')
+        plt.xticks(rotation=0)
+        plt.ylabel('Number of Players')
+        plt.show()
+
+
 # ------------------------------------------
 
 if __name__ == "__main__":
@@ -111,3 +128,5 @@ if __name__ == "__main__":
     # plot_pca(fifa_df)
     # plot_clustering(fifa_df)
     # run_clustering(fifa_df)
+    clusters_distribution(fifa_df)
+    # determine_num_of_clusters(fifa_df)

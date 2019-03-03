@@ -26,11 +26,11 @@ CLUSTERING_PLAYER_FEATURES_VECTOR = ['Name', 'ID', 'Position'] + FIFA_MAIN_FEATU
 # ------------------------------------------
 # https://gaming.stackexchange.com/questions/167318/what-do-fifa-14-position-acronyms-mean
 
-DEFENDERS = ['CB', 'LCB', 'RCB', 'LB', 'RB', 'LWB', 'RWB', 'LB']
+DEFENDERS = ['LCB', 'CB', 'RCB']
 
-MIDFIELDERS = ['CM', 'LDM', 'LAM', 'RDM', 'RAM', 'CDM', 'CAM', 'LM', 'RM', 'LCM', 'RCM']
+MIDFIELDERS = ['LB', 'LCM', 'LDM', 'LF', 'CDM', 'CM', 'LWB', 'RB', 'RCM', 'RDM', 'RWB']
 
-FORWARDS = ['ST', 'CF', 'LW', 'RW', 'LS', 'RS', 'LF', 'RF']
+FORWARDS = ['LAM', 'CAM', 'CF', 'LM', 'LS', 'LW', 'RAM', 'RF', 'RM', 'RS', 'RW', 'ST']
 
 GOALKEEPERS = ['GK']
 
