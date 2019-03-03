@@ -124,7 +124,7 @@ def clusters_distribution(df: pd.DataFrame):
 
 if __name__ == "__main__":
     fifa_df = pd.read_csv(utils.relpath('csv/players_f19_edited.csv'))
-    # run_similarity(fifa_df)
+    run_similarity(fifa_df)
     # plot_similarity(fifa_df)
     # plot_pca(fifa_df)
     # plot_clustering(fifa_df)
