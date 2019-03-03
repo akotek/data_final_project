@@ -102,7 +102,6 @@ def run_clustering(df):
 
 def plot_clustering(df):
     prcss_df, clstr_df = run_clustering(df)
-    df = pd.merge(prcss_df, clstr_df['Cluster'], )
     visualizer.plot_clustering(clstr_df)
 
 
