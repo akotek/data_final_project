@@ -1,22 +1,9 @@
 import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import precision_recall_curve, accuracy_score
+from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
-from sklearn.utils.fixes import signature
-from sklearn.neural_network import MLPClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from catboost import CatBoostClassifier
-from mlxtend.plotting import plot_learning_curves
 
 
 def get_accuracy_vector(preds, truth):
@@ -42,17 +29,17 @@ def plot_test_acc(baseline_preds, model_preds, truth):
 
 
 def make_predictions():
-    data = pd.read_csv(os.path.join('csv', 'prediction_data.csv'))
+    data = pd.read_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'csv', 'prediction_data.csv'))
     X = data.drop(['recommend_to_go'], axis=1)
-    # X = StandardScaler().fit_transform(X)
     Y = data['recommend_to_go']
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.1)
 
     classifier = CatBoostClassifier()
     classifier.fit(X_train, y_train)
     y_score = classifier.predict(X_test)
-    average_precision = average_precision_score(y_test, y_score)
+    print('Our model accuracy score:')
     print(accuracy_score(y_test, y_score))
+    print('Baseline model accuracy score:')
     print(accuracy_score(y_test, [1] * len(y_test)))
     print(classifier.get_feature_importance(prettified=True))
     plot_test_acc([1] * len(y_test), y_score, y_test.to_list())

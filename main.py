@@ -3,6 +3,7 @@ import data_parsing.clustering as clustering
 import data_parsing.visualization as visualizer
 import matplotlib.pyplot as plt
 from data_parsing.clustering import determine_num_of_clusters
+from predictor.predictor import make_predictions
 
 
 NUM_OF_CLUSTERS = 4
@@ -128,5 +129,6 @@ if __name__ == "__main__":
     # plot_pca(fifa_df)
     # plot_clustering(fifa_df)
     # run_clustering(fifa_df)
-    clusters_distribution(fifa_df)
+    # clusters_distribution(fifa_df)
     # determine_num_of_clusters(fifa_df)
+    make_predictions()

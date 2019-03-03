@@ -169,7 +169,7 @@ def get_top_similarities(df: pd.DataFrame, selected_players: pd.DataFrame, recom
 
 def generate_weights(player):
     """
-    generate weights for the diffrant features of the the given player
+    generate weights for the different features of the the given player
     :param player: the player we want to generate weights
     :return: a vector of weights
     """

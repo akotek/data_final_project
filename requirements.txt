@@ -1,3 +1,5 @@
+matplotlib
+catboost
 numpy>=1.15.2
 pandas>=0.24.0
 python-dateutil>=2.7.5
