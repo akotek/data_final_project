@@ -18,21 +18,20 @@ Description of project files:
 Our project has 2 main directories:
 1. data_parsing directory:
 This directory holds all the files relevant to data analysis, clustering and Player Similarities part of the project.
-a. csv directory:
-This directory contains our FIFA19 dataset, one of the csvs is the original dataset and the other is processed and changed             by us for project use.
-b. clustering.py - Code responsible for data clustering tasks.
-c. constants.py - Different constants (e.g column names) that were used in different .py files in our project.
-d. processed.csv - FIFA19 processed csv for Players Similarity use.
-e. similarity.py - Code responsible for Player Similarity tasks.
-f. utils.py - Different function for use in different .py files throughout our project.
-g. visualization.py - Code responsilbe for some of our project visualizations.
+   - csv directory: This directory contains our FIFA19 dataset, one of the csvs is the original dataset and the other is processed and changed by us for project use.
+   - clustering.py - Code responsible for data clustering tasks.
+   - constants.py - Different constants (e.g column names) that were used in different .py files in our project.
+   - processed.csv - FIFA19 processed csv for Players Similarity use.
+   - similarity.py - Code responsible for Player Similarity tasks.
+   - utils.py - Different function for use in different .py files throughout our project.
+   - visualization.py - Code responsilbe for some of our project visualizations.
 2. predictor directory:
-a. predictor.py - The file with the our Transfer Benefit Prediction model.
-c. csv directory:
-            1. prediction_data.csv - The input data for our Transfer Benefit Prediction model.
-            2. transfers.csv - All of the transfers we managed to find using the available data.
-            3. The rest of the csv files were middle points between raw-data and transfer.csv creation.
-d. The rest of the .py files were used just to process FIFA08-FIFA16 dataset and create prediction_data.csv.
+   - predictor.py - The file with the our Transfer Benefit Prediction model.
+   - csv directory:
+     - prediction_data.csv - The input data for our Transfer Benefit Prediction model.
+     - transfers.csv - All of the transfers we managed to find using the available data.
+     - The rest of the csv files were middle points between raw-data and transfer.csv creation.
+   - The rest of the .py files were used just to process FIFA08-FIFA16 dataset and create prediction_data.csv.
 
 ## Notes:
 1. If you wish to run the project please take a look at requirements.txt that lists all the package dependencies.
